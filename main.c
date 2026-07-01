@@ -1,8 +1,10 @@
 #include <stdio.h>
 #include <winsock2.h>
+#include <time.h>
+#include <string.h>
 
-#include "http/inc/parser.h"
-
+#include "chttp.h"
+/*
 void print_request(const ChttpRequest *req)
 {
 	printf("========== HTTP REQUEST INFO ==========\n");
@@ -14,7 +16,7 @@ void print_request(const ChttpRequest *req)
 		default:         printf("UNKNOWN\n"); break;
 	}
 
-	printf("URL:          %.*s (length: %zu)\n", (int)req->url_len, req->url, req->url_len);
+	printf("URL:          %.*s (length: %d)\n", (int)req->url_len, req->url, req->url_len);
 
 	printf("HTTP Version: ");
 	switch (req->http_version) {
@@ -25,15 +27,15 @@ void print_request(const ChttpRequest *req)
 		default:           printf("UNKNOWN\n"); break;
 	}
 
-	printf("Headers count: %zu\n", req->headers_count);
-	for (size_t i = 0; i < req->headers_count; i++) {
-		printf("  [%zu] %.*s: %.*s\n",
+	printf("Headers count: %d\n", req->headers_count);
+	for (int i = 0; i < req->headers_count; i++) {
+		printf("  [%d] %.*s: %.*s\n",
 			i,
 			(int)req->headers[i].key_len, req->headers[i].key,
 			(int)req->headers[i].val_len, req->headers[i].val);
 	}
 
-	printf("Body length:  %zu\n", req->body_len);
+	printf("Body length:  %d\n", req->body_len);
 	if (req->body_len > 0 && req->body != NULL) {
 		printf("Body:\n%s\n", req->body);
 	} else {
@@ -41,20 +43,55 @@ void print_request(const ChttpRequest *req)
 	}
 	printf("=======================================\n");
 }
+*/
 
-void handle_conn(SOCKET sock) {
+
+int render(const char *filepath, const char *content_type, socket_t sock)
+{
+	FILE *f = fopen(filepath, "r");
+	if (f == NULL)
+		return 0;
+
+	fseek(f, 0, SEEK_END);
+	long size = ftell(f);
+	fseek(f, 0, SEEK_SET);
+	char head[4096] = {0};
+	char buf[4096] = {0};
+
+	snprintf(head, sizeof(head),
+		"HTTP/1.1 200 OK\r\nContent-Type: %s\r\nContent-Length: %ld\r\nConnection: close\r\n\r\n",
+		content_type, size);
+
+	chttp_write(sock, head, strlen(head));
+
+	char *c;
+	while((c = fgets(buf, sizeof(buf), f)) != NULL)
+		chttp_write(sock, buf, strlen(buf));
+
+	fclose(f);
+	return 1;
+}
+
+void indexhandler(ChttpRequest *req, socket_t sock)
+{
+	if (!render("index.html", "text/html", sock)) {
+		printf("[ERROR] failed send index.html\n");
+	}
+}
+
+void handle_conn(SOCKET sock)
+{
 	char buf[4096];
 	int len = recv(sock, buf, sizeof(buf), 0);
-	if (len > 0) {
-		ChttpRequest req = {0};
+	ChttpRequest req = {0};
 
-		if (!parse_request(&req, buf)) {
-			printf("[ERROR] invalid request\n");
-			return;
-		}
 
-		print_request(&req);
-	}
+	Router router = {0};
+	route(&router, CHTTP_GET, "/", 1, indexhandler);
+
+	chttp_parse_request(&req, buf);
+
+	dispatch(&router, &req, sock);
 }
 
 int main(void)

@@ -50,10 +50,11 @@ int eol_header_end(char *eol)
 
 	return 0;
 }
-int parse_req_line(char *line, size_t line_len,
-                   char **method, size_t *method_len,
-                   char **url, size_t *url_len,
-                   char **http, size_t *http_len)
+
+int parse_req_line(char *line, int line_len,
+                   char **method, int *method_len,
+                   char **url, int *url_len,
+                   char **http, int *http_len)
 {
 	if (!line || !method || !method_len || !url || !url_len || !http || !http_len)
 		return -1;
@@ -98,7 +99,7 @@ int parse_req_line(char *line, size_t line_len,
 	return 0;
 }
 
-ChttpMethod get_method(char *method, size_t method_len)
+ChttpMethod _get_method(char *method, int method_len)
 {
 	if (method == NULL) return CHTTP_UNKNOWN;
 
@@ -108,7 +109,7 @@ ChttpMethod get_method(char *method, size_t method_len)
 	return CHTTP_UNKNOWN;
 }
 
-ChttpVersion get_http_ver(char *http)
+ChttpVersion _get_http_ver(char *http)
 {
 	if (!strncmp(http, "HTTP/1.0", 8)) return HTTP_VER_1_0;
 	if (!strncmp(http, "HTTP/1.1", 8)) return HTTP_VER_1_1;
@@ -118,7 +119,7 @@ ChttpVersion get_http_ver(char *http)
 	return HTTP_VER_UNKNOWN;
 }
 
-int parse_request(ChttpRequest *req, char *str)
+int chttp_parse_request(ChttpRequest *req, char *str)
 {
 	if (str == NULL) return 0;
 
@@ -126,34 +127,35 @@ int parse_request(ChttpRequest *req, char *str)
 	char *end = 0;
 
 	char *method;
-	size_t method_len;
+	int method_len;
 
 	char *url;
-	size_t url_len;
+	int url_len;
 
 	char *http;
-	size_t http_len;
+	int http_len;
 
-	// parse head
+	// parse request line
 	end = find_eol(ptr);
 	if (!end) return 0;
 
 	if (parse_req_line(ptr, end - ptr, &method, &method_len, &url, &url_len, &http, &http_len) != 0)
 		return 0;
 
-	ChttpMethod chttp_method = get_method(method, method_len);
+	ChttpMethod chttp_method = _get_method(method, method_len);
 	if (chttp_method == CHTTP_UNKNOWN)
 		return 0;
 
 	req->method = chttp_method;
 	req->url = url;
 	req->url_len = url_len;
-	req->http_version = get_http_ver(http);
+	req->http_version = _get_http_ver(http);
 
-	size_t hindex = 0;
+	int hindex = 0;
 	ptr = end + eol_len(end);
 	int body_found = 0;
 
+	// parse headers
 	while(ptr && *ptr != '\0') {
 		end = find_eol(ptr);
 		if (!end) return 0;
@@ -166,12 +168,13 @@ int parse_request(ChttpRequest *req, char *str)
 
 			req->body = ptr + header_end;
 			req->body_len = strlen(req->body);
+
 			body_found = 1;
 			break;
 		}
 
 
-		if (hindex < MAX_HEADERS) {
+		if (hindex < CHTTP_MAX_HEADERS) {
 			char *colon = strchr(ptr, ':');
 			if (colon && colon < end) {
 				req->headers[hindex].key = ptr;

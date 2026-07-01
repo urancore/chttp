@@ -1,9 +1,7 @@
-#ifndef CHTTP_PARSER_H
-#define CHTTP_PARSER_H 1
+#ifndef CHTTP_TYPES_H
+#define CHTTP_TYPES_H
 
-#include <stdlib.h>
-
-#define MAX_HEADERS 64
+#define CHTTP_MAX_HEADERS 64
 
 typedef enum {
 	CHTTP_GET,
@@ -21,25 +19,23 @@ typedef enum {
 
 typedef struct {
 	char *key;
-	size_t key_len;
+	int key_len;
 	char *val;
-	size_t val_len;
+	int val_len;
 } ChttpHeader;
 
 typedef struct
 {
 	ChttpMethod method;
 	char *url; // TODO: *add typedef struct URL
-	size_t url_len;
+	int url_len;
 	ChttpVersion http_version;
 
-	ChttpHeader headers[MAX_HEADERS];
-	size_t headers_count;
+	ChttpHeader headers[CHTTP_MAX_HEADERS];
+	int headers_count;
 
 	char *body;
-	size_t body_len;
+	int body_len;
 } ChttpRequest;
-
-int parse_request(ChttpRequest *req, char *str);
 
 #endif
