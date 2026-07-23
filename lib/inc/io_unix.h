@@ -1,14 +1,12 @@
 #ifndef CHTTP_IO_H
 #define CHTTP_IO_H
 
-#include <sys/socket.h>
-#include <unistd.h>
-#include <stdio.h>
+#include <stdlib.h>
 
-typedef int socket_t;
+#include "types.h"
 
-static inline int chttp_write(int fd, const char* data, size_t len) {
-    return (int)write(fd, data, len);
+static inline int chttp_write(chttp_socket_t fd, const char *data, size_t len) {
+	return (int)write(fd, data, len);
 }
 
 #endif
