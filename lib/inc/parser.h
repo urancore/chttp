@@ -3,6 +3,6 @@
 
 #include "types.h"
 
-int chttp_parse_request(ChttpRequest *req, char *str);
+int chttp_request_parse(ChttpRequest *req, char *str);
 
 #endif

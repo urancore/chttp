@@ -119,7 +119,7 @@ ChttpVersion _get_http_ver(char *http)
 	return HTTP_VER_UNKNOWN;
 }
 
-int chttp_parse_request(ChttpRequest *req, char *str)
+int chttp_request_parse(ChttpRequest *req, char *str)
 {
 	if (str == NULL) return 0;
 
