@@ -1,11 +1,11 @@
 #ifndef CHTTP_H
 #define CHTTP_H
 
-#include "lib/inc/types.h"
-#include "lib/inc/parser.h"
-#include "lib/inc/handler.h"
-#include "lib/inc/platform.h"
-#include "lib/inc/server.h"
-#include "lib/inc/response.h"
+#include "src/inc/types.h"
+#include "src/inc/parser.h"
+#include "src/inc/handler.h"
+#include "src/inc/platform.h"
+#include "src/inc/server.h"
+#include "src/inc/response.h"
 
 #endif /* CHTTP_H */
