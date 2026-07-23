@@ -5,5 +5,7 @@
 #include "lib/inc/parser.h"
 #include "lib/inc/handler.h"
 #include "lib/inc/platform.h"
+#include "lib/inc/server.h"
+#include "lib/inc/response.h"
 
-#endif
+#endif /* CHTTP_H */
