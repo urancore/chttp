@@ -59,6 +59,9 @@ typedef struct ChttpResponse ChttpResponse;
 typedef struct ChttpRouter ChttpRouter;
 typedef struct ChttpRoute ChttpRoute;
 
+typedef void (*ChttpLoggerFunc)(const char *message);
+
+
 typedef struct ChttpServer {
 	int port;
 	char *addr;
@@ -66,6 +69,7 @@ typedef struct ChttpServer {
 	int read_buffer_size;
 	int write_buffer_size;
 	int max_header_size;
+	size_t max_body_size;
 
 	unsigned long read_timeout;
 	unsigned long write_timeout;
@@ -74,6 +78,8 @@ typedef struct ChttpServer {
 	int max_connections;
 
 	ChttpRouter *router;
+
+	ChttpLoggerFunc logger;
 } ChttpServer;
 
 typedef struct ChttpResponse {
@@ -84,14 +90,13 @@ typedef struct ChttpResponse {
 	unsigned long long write_pos;
 } ChttpResponse;
 
-typedef void (*HandlerFunc)(ChttpResponse *resp, ChttpRequest *req);
-
+typedef void (*ChttpHandlerFunc)(ChttpResponse *resp, ChttpRequest *req);
 
 typedef struct ChttpRoute {
 	ChttpMethod method;
 	char *url;
 	int url_len;
-	HandlerFunc handler;
+	ChttpHandlerFunc handler;
 } ChttpRoute;
 
 typedef struct ChttpRouter {

@@ -153,7 +153,6 @@ int chttp_request_parse(ChttpRequest *req, char *str)
 
 	int hindex = 0;
 	ptr = end + eol_len(end);
-	int body_found = 0;
 
 	// parse headers
 	while(ptr && *ptr != '\0') {
@@ -165,11 +164,7 @@ int chttp_request_parse(ChttpRequest *req, char *str)
 			if (header_end <= 0) {
 				header_end = eol_len(ptr);
 			}
-
 			req->body = ptr + header_end;
-			req->body_len = strlen(req->body);
-
-			body_found = 1;
 			break;
 		}
 
@@ -196,9 +191,6 @@ int chttp_request_parse(ChttpRequest *req, char *str)
 
 		ptr = end + eol_len(end);
 	}
-
-	if (!body_found)
-		return 0;
 
 	req->headers_count = hindex;
 	return 1;

@@ -3,7 +3,7 @@
 
 #include "types.h"
 
-void chttp_route(ChttpRouter *router, ChttpMethod method, char *url, HandlerFunc handler);
+void chttp_route(ChttpRouter *router, ChttpMethod method, char *url, ChttpHandlerFunc handler);
 void chttp_dispatch(ChttpRouter *router, ChttpResponse *resp, ChttpRequest *req);
 
 #endif

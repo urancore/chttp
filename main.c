@@ -4,6 +4,10 @@
 
 #include "chttp.h"
 
+void my_log(const char *message) {
+	printf("%s\n", message);
+}
+
 void mainpage_handler(ChttpResponse *resp, ChttpRequest *req) {
 	(void)req;
 	chttp_response_write_string(resp, "HTTP/1.1 200 OK\r\n");
@@ -15,24 +19,37 @@ void mainpage_handler(ChttpResponse *resp, ChttpRequest *req) {
 	chttp_response_flush(resp);
 }
 
+void upload_handler(ChttpResponse *resp, ChttpRequest *req) {
+	(void)req;
+	chttp_response_write_string(resp, "HTTP/1.1 200 OK\r\n");
+	chttp_response_write_string(resp, "\r\n");
+	chttp_response_write_string(resp, "<h1>UPLOADED</h1>"); // body
+	chttp_response_flush(resp);
+}
+
 int main(void)
 {
 	ChttpServer server = {0};
 	server.addr = "127.0.0.1";
 	server.port = 5000;
 
-	server.read_buffer_size = 0x1000; // 4KiB
+	server.read_buffer_size = 0x100000; // 1MiB
 	server.write_buffer_size = 0x10000; // 64KiB
-	server.max_header_size = 0x100000; // 1MB
+	server.max_header_size = 0x10000; // 64KiB
+	server.max_body_size = 0x10000; // 64KiB
 
-	server.read_timeout = 3000; // 30 sec
-	server.write_timeout = 30000; // 30 sec
-	server.idle_timeout = 60000; // 60 sec
+
+	server.read_timeout = 10000; // 10 sec
+	server.write_timeout = 10000; // 10 sec
+	server.idle_timeout = 30000; // 30 sec
 
 	server.max_connections = SOMAXCONN;
 
+	server.logger = my_log;
+
 	ChttpRouter router = {0};
 	chttp_route(&router, CHTTP_GET, "/", mainpage_handler);
+	chttp_route(&router, CHTTP_POST, "/upload", upload_handler);
 
 	server.router = &router;
 

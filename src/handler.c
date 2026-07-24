@@ -4,7 +4,7 @@
 #include "inc/handler.h"
 #include "inc/types.h"
 
-void chttp_route(ChttpRouter *router, ChttpMethod method, char *url, HandlerFunc handler)
+void chttp_route(ChttpRouter *router, ChttpMethod method, char *url, ChttpHandlerFunc handler)
 {
 	if (router->route_count >= MAX_ROUTES) return;
 
