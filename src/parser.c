@@ -105,6 +105,9 @@ ChttpMethod _get_method(char *method, int method_len)
 
 	if (method_len == 3 && !strncmp(method, "GET", 3)) return CHTTP_GET;
 	if (method_len == 4 && !strncmp(method, "POST", 4)) return CHTTP_POST;
+	if (method_len == 3 && !strncmp(method, "PUT", 3)) return CHTTP_PUT;
+	if (method_len == 5 && !strncmp(method, "PATCH", 5)) return CHTTP_PATCH;
+	if (method_len == 6 && !strncmp(method, "DELETE", 6)) return CHTTP_DELETE;
 
 	return CHTTP_UNKNOWN;
 }

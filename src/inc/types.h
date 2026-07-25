@@ -61,7 +61,6 @@ typedef struct ChttpRoute ChttpRoute;
 
 typedef void (*ChttpLoggerFunc)(const char *message);
 
-
 typedef struct ChttpServer {
 	int port;
 	char *addr;

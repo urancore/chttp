@@ -13,7 +13,6 @@ void mainpage_handler(ChttpResponse *resp, ChttpRequest *req) {
 	chttp_response_write_string(resp, "HTTP/1.1 200 OK\r\n");
 	chttp_response_set_header(resp, "1232313", "12312312312312");
 	chttp_response_set_header(resp, "Hello-World", "hihihi");
-	chttp_response_set_header(resp, "ABOBA", "ABOBA2006");
 	chttp_response_write_string(resp, "\r\n");
 	chttp_response_write_string(resp, "<h1>Hello world</h1>"); // body
 	chttp_response_flush(resp);
