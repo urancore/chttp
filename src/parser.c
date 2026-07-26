@@ -3,7 +3,7 @@
 
 #include "inc/parser.h"
 
-char *find_eol(char *s)
+static char *find_eol(char *s)
 {
 	if (s == NULL) return NULL;
 
@@ -17,7 +17,7 @@ char *find_eol(char *s)
 	return (crlf < lf) ? crlf : lf;
 }
 
-int eol_len(char *eol)
+static int eol_len(char *eol)
 {
 	if (eol == NULL || eol[0] == '\0' )
 		return 0;
@@ -32,7 +32,7 @@ int eol_len(char *eol)
 }
 
 // return len crlf/lf
-int eol_header_end(char *eol)
+static int eol_header_end(char *eol)
 {
 	if (eol == NULL || eol[0] == '\0')
 		return 0;
@@ -51,7 +51,7 @@ int eol_header_end(char *eol)
 	return 0;
 }
 
-int parse_req_line(char *line, int line_len,
+static int parse_req_line(char *line, int line_len,
                    char **method, int *method_len,
                    char **url, int *url_len,
                    char **http, int *http_len)
@@ -99,7 +99,7 @@ int parse_req_line(char *line, int line_len,
 	return 0;
 }
 
-ChttpMethod _get_method(char *method, int method_len)
+static ChttpMethod _get_method(char *method, int method_len)
 {
 	if (method == NULL) return CHTTP_UNKNOWN;
 
@@ -112,7 +112,7 @@ ChttpMethod _get_method(char *method, int method_len)
 	return CHTTP_UNKNOWN;
 }
 
-ChttpVersion _get_http_ver(char *http)
+static ChttpVersion _get_http_ver(char *http)
 {
 	if (!strncmp(http, "HTTP/1.0", 8)) return HTTP_VER_1_0;
 	if (!strncmp(http, "HTTP/1.1", 8)) return HTTP_VER_1_1;

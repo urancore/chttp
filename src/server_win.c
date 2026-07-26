@@ -30,7 +30,7 @@ static void server_log(ChttpServer *server, const char *fmt, ...) {
 }
 
 static int read_headers(chttp_socket_t client, ChttpServer *server,
-                        char *buffer, int buffer_size, int *out_header_size)
+				char *buffer, int buffer_size, int *out_header_size)
 {
 	int total_bytes = 0;
 	int bytes_received = 0;
@@ -81,8 +81,8 @@ static int read_headers(chttp_socket_t client, ChttpServer *server,
 }
 
 static int read_body(chttp_socket_t client, ChttpServer *server,
-                     char *buffer, int buffer_size, int header_end_pos,
-                     size_t content_length, size_t *out_body_received)
+			char *buffer, int buffer_size, int header_end_pos,
+			size_t content_length, size_t *out_body_received)
 {
 	int body_start_pos = header_end_pos;
 	size_t body_already_received = buffer_size - header_end_pos;
@@ -137,7 +137,7 @@ static int read_body(chttp_socket_t client, ChttpServer *server,
 }
 
 static int parse_content_length(ChttpRequest *request, ChttpServer *server,
-                                size_t *out_content_length)
+					size_t *out_content_length)
 {
 	*out_content_length = 0;
 
