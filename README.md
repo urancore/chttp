@@ -33,33 +33,13 @@ void my_log(const char *message) {
 	printf("%s\n", message);
 }
 
-void get_str_method(ChttpMethod method, char *buf, int buf_size) {
-	switch (method) {
-		case CHTTP_GET:
-			snprintf(buf, buf_size, "GET");
-			break;
-		case CHTTP_POST:
-			snprintf(buf, buf_size, "POST");
-			break;
-		case CHTTP_PUT:
-			snprintf(buf, buf_size, "PUT");
-			break;
-		case CHTTP_PATCH:
-			snprintf(buf, buf_size, "PATCH");
-			break;
-		case CHTTP_DELETE:
-			snprintf(buf, buf_size, "DELETE");
-			break;
-		default:
-			snprintf(buf, buf_size, "UNKNOWN");
-			break;
-	}
-}
-
 void mainpage_handler(ChttpResponse *resp, ChttpRequest *req) {
-	char method_str[16];
-	get_str_method(req->method, method_str, sizeof(method_str));
-	printf("Request: %s %.*s\n", method_str, req->url_len, req->url);
+	printf("MainPage: %.*s\n", req->url.path_len, req->url.path);
+
+	for (unsigned int i = 0; i < req->url.queries_count; i++) {
+		printf("Query: %.*s:%.*s\n", req->url.queries[i].key_len, req->url.queries[i].key,
+			req->url.queries[i].val_len, req->url.queries[i].val);
+	}
 
 	chttp_response_write_string(resp, "HTTP/1.1 200 OK\r\n");
 	chttp_response_set_header(resp, "1232313", "12312312312312");
@@ -110,6 +90,7 @@ int main(void)
 
 	return 0;
 }
+
 ```
 
 ## Roadmap
