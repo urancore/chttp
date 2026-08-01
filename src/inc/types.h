@@ -3,6 +3,7 @@
 
 #define CHTTP_MAX_HEADERS 64
 #define MAX_ROUTES 64
+#define MAX_QUERIES 64
 
 #if defined(_WIN32) || defined(_WIN64)
 	#if defined(_WIN64)
@@ -39,12 +40,27 @@ typedef struct KeyVal {
 } KeyVal;
 
 typedef KeyVal ChttpHeader;
+typedef KeyVal ChttpURLQuery;
 
-typedef struct
-{
+typedef struct ChttpServer ChttpServer;
+typedef struct ChttpResponse ChttpResponse;
+typedef struct ChttpRouter ChttpRouter;
+typedef struct ChttpRoute ChttpRoute;
+
+typedef struct ChttpURL {
+	char *url;
+	unsigned int url_len;
+
+	char *path;
+	unsigned int path_len;
+
+	ChttpURLQuery queries[MAX_QUERIES];
+	unsigned int queries_count;
+} ChttpURL;
+
+typedef struct ChttpRequest {
 	ChttpMethod method;
-	char *url; // TODO: *add typedef struct URL
-	int url_len;
+	ChttpURL url;
 	ChttpVersion http_version;
 
 	ChttpHeader headers[CHTTP_MAX_HEADERS];
@@ -53,11 +69,6 @@ typedef struct
 	char *body;
 	int body_len;
 } ChttpRequest;
-
-typedef struct ChttpServer ChttpServer;
-typedef struct ChttpResponse ChttpResponse;
-typedef struct ChttpRouter ChttpRouter;
-typedef struct ChttpRoute ChttpRoute;
 
 typedef void (*ChttpLoggerFunc)(const char *message);
 

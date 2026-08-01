@@ -112,14 +112,61 @@ static ChttpMethod _get_method(char *method, int method_len)
 	return CHTTP_UNKNOWN;
 }
 
-static ChttpVersion _get_http_ver(char *http)
+static ChttpVersion _get_http_ver(char *http, int http_len)
 {
-	if (!strncmp(http, "HTTP/1.0", 8)) return HTTP_VER_1_0;
-	if (!strncmp(http, "HTTP/1.1", 8)) return HTTP_VER_1_1;
-	if (!strncmp(http, "HTTP/2.0", 8)) return HTTP_VER_2_0;
-	if (!strncmp(http, "HTTP/3.0", 8)) return HTTP_VER_3_0;
+	if (http_len == 8) {
+		if (!strncmp(http, "HTTP/1.0", 8)) return HTTP_VER_1_0;
+		if (!strncmp(http, "HTTP/1.1", 8)) return HTTP_VER_1_1;
+		if (!strncmp(http, "HTTP/2.0", 8)) return HTTP_VER_2_0;
+		if (!strncmp(http, "HTTP/3.0", 8)) return HTTP_VER_3_0;
+	}
 
 	return HTTP_VER_UNKNOWN;
+}
+
+int chttp_url_parse(ChttpURL *chttp_url, char *url, int url_size)
+{
+	if (chttp_url == NULL || url == NULL) return 0;
+	char *query_start = memchr(url, '?', url_size);
+
+	char *url_end = url + url_size;
+	char *path_end = query_start ? query_start : url_end;
+
+	chttp_url->url = url;
+	chttp_url->url_len = url_size;
+	chttp_url->path = url;
+	chttp_url->path_len = path_end-url;
+	chttp_url->queries_count = 0;
+
+	if (!query_start || (query_start + 1) >= url_end) return 1;
+
+	char *ptr = query_start + 1;
+	while (ptr < url_end && chttp_url->queries_count < MAX_QUERIES) {
+		char *next_pair = memchr(ptr, '&', url_end - ptr);
+		char *pair_end = next_pair ? next_pair : url_end;
+		char *eq_ptr = memchr(ptr, '=', pair_end - ptr);
+
+		ChttpURLQuery *q = &chttp_url->queries[chttp_url->queries_count];
+
+		if (eq_ptr) {
+			q->key = ptr;
+			q->key_len = (int)(eq_ptr - ptr);
+			q->val = eq_ptr + 1;
+			q->val_len = (int)(pair_end - (eq_ptr + 1));
+		} else {
+			q->key = ptr;
+			q->key_len = (int)(pair_end - ptr);
+			q->val = NULL;
+			q->val_len = 0;
+		}
+
+		chttp_url->queries_count++;
+
+		if (!next_pair) break;
+		ptr = next_pair + 1;
+	}
+
+	return 1;
 }
 
 int chttp_request_parse(ChttpRequest *req, char *str)
@@ -150,9 +197,12 @@ int chttp_request_parse(ChttpRequest *req, char *str)
 		return 0;
 
 	req->method = chttp_method;
-	req->url = url;
-	req->url_len = url_len;
-	req->http_version = _get_http_ver(http);
+
+	if (!chttp_url_parse(&req->url, url, url_len)) {
+		return 0;
+	}
+
+	req->http_version = _get_http_ver(http, http_len);
 
 	int hindex = 0;
 	ptr = end + eol_len(end);
@@ -170,7 +220,6 @@ int chttp_request_parse(ChttpRequest *req, char *str)
 			req->body = ptr + header_end;
 			break;
 		}
-
 
 		if (hindex < CHTTP_MAX_HEADERS) {
 			char *colon = strchr(ptr, ':');

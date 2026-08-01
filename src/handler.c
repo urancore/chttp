@@ -19,7 +19,7 @@ void chttp_dispatch(ChttpRouter *router, ChttpResponse *resp, ChttpRequest *req)
 {
 	for (int i = 0; i < router->route_count; i++) {
 		if (router->routes[i].method == req->method
-			&& strncmp(req->url, router->routes[i].url, router->routes[i].url_len) == 0) {
+			&& strncmp(req->url.path, router->routes[i].url, router->routes[i].url_len) == 0) {
 			router->routes[i].handler(resp, req);
 			break;
 		}

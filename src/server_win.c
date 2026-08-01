@@ -173,7 +173,6 @@ static int parse_content_length(ChttpRequest *request, ChttpServer *server,
 	return 0;
 }
 
-
 VOID CALLBACK ClientWorker(PTP_CALLBACK_INSTANCE instance, PVOID context, PTP_WORK work)
 {
 	(void)work;
@@ -240,7 +239,7 @@ VOID CALLBACK ClientWorker(PTP_CALLBACK_INSTANCE instance, PVOID context, PTP_WO
 	request.body_len = body_received;
 
 	server_log(server, "DEBUG: method: %d, url: %.*s",
-	          request.method, request.url_len, request.url);
+	          request.method, request.url.url_len, request.url.url);
 	server_log(server, "DEBUG: body offset: %d bytes", header_size);
 	server_log(server, "DEBUG: body length: %zu bytes", request.body_len);
 	server_log(server, "DEBUG: total received: %d bytes", total_bytes_read);
